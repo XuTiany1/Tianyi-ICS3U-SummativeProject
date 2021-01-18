@@ -1,0 +1,91 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Profile {% endblock title %}
+
+{% block content %}
+
+<!-- 
+  This HTML file is the file that is displayed after the user clicks on Next Step button on the attend-selectcourse.html
+-->
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+        <div class="container-fluid">
+          <div class="header-body">
+  
+            <div class="row">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Body -->
+    <div class="container-fluid mt--7">
+      <div class="row">
+        <div class="col-xl-8 order-xl-1">
+          <div class="card bg-secondary shadow">
+            <div class="card-header bg-white border-0">
+              <div class="row align-items-center">
+                <div class="col-8">
+                  <h3 class="mb-0">Record attendance</h3>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Clicking on the Record Attendance button will direct the user to attend.html with the method post -->
+              <form action="/attend.html" method="post">
+
+                {% csrf_token %}
+                <!-- Gives access to form -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <!-- Displays course name -->
+                      <label class="form-control-label" for="id_name">Course Name</label>
+                      <input type="text" name="attendance_course" maxlength="200" required id="id_name" disabled value="{{ coursename }}">
+                      <input type="hidden" name="target_course" value="{{ coursename }}">
+                    </div>
+                </div>
+                    <!-- Allows user to choose the date attended -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-control-label" for="id_date">Date attended</label>
+                      <input type="date" name="attendance_date" required id="id_date" value="01/1/2021">
+                    </div>
+                  </div>
+                </div>
+                <!-- Allows user to check the students for attendance -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-control-label" for="id_student">Students</label>
+                        <!-- Uses for loop to loop through all the students in the registration list -->
+                        {% for registration in registration_list %}
+                        <!-- For each student, a checkbox will appear and its name will be displayed on the right -->
+                        <li>
+                            <input type="checkbox" name="attendance_students" id="id_student" value="{{ registration.student.name }}">
+                            {{ registration.student.name }}
+                        </li>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Record Attendance</button>
+                    <!-- If the user chooses close, they will be directed to attendance.html -->
+                    <a href="/attendance.html">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>  
+                      </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,276 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+<!-- 
+  This HTML file is the file that is displayed after the user clicks on Courses on the sidebar
+-->
+
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="container-fluid mt--7">
+
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Courses Table</h3>
+              <!-- If the user is to click on the + button on the top left, the addClassModal will be triggered inside this html file and a modal will appear -->
+              <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#addClassModal">+</button></a>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <!-- The column names for the table -->
+                  <tr>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Period</th>
+                    <th scope="col">Place</th>
+                    <th scope="col">Price(CAD/Class)</th>
+                    <th scope="col">Start Date</th>
+                    <th scope="col">End Date</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="list">
+                  <!-- Loops through the existingCourses in order to display each courses -->
+                  {% for currCourse in existingCourses %}
+                    <tr>
+                      <!-- For each COURSE, create a row and fill the row with its own information
+                              - Its course name
+                              - the place of the course
+                              - The price of the course
+                              - The start date of the course
+                              - The end date of the course
+                              - Its edit button
+                              - Its delete button
+                      -->
+                      <th scope="row">
+                        <div class="media align-items-center">
+                          <div class="media-body">
+                            <span class="mb-0 text-sm">{{ currCourse.name}}</span>
+                          </div>
+                        </div>
+                      </th>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currCourse.period }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currCourse.place }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currCourse.price }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currCourse.start }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currCourse.end }}
+                        </span>
+                      </td>
+                    </td>
+                      <td class="text-right">
+                        <div class="dropdown">
+                          <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                            <a class="dropdown-item" data-toggle="modal" data-target="#editCourse{{currCourse.pk|cut:" "}}">Edit</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#deleteCourse{{currCourse.pk|cut:" "}}">Delete</a>                           
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Delete Course -->
+                        <div class="modal fade" id="deleteCourse{{currCourse.pk|cut:" "}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete Course</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form" action="/deleteCourse.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="input-coursename">Do you want to delete the course: {{currCourse.name}} ?</label>
+                                      <input type="hidden" name="targetCourse" value="{{ currCourse.pk }}">
+                                    </div>
+                                  </div>
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Edit Course -->
+                        <div class="modal fade" id="editCourse{{currCourse.pk|cut:" "}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <form role="form" action="/editCourse.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Name</label>
+                                      <input type="text" name="editCourse_name" maxlength="200" required id="id_name" value="{{ currCourse.name}}">
+                                      <input type="hidden" name="targetCourse" value="{{ currCourse.pk }}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_period">Period</label>
+                                      <input type="text" name="editCourse_period" maxlength="200" required id="id_period" value="{{ currCourse.period}}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_place">Place</label>
+                                      <input type="text" name="editCourse_place" maxlength="200" required id="id_place" value="{{ currCourse.place}}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_price">Price</label>
+                                      <input type="number" name="editCourse_price"  required id="id_price" value="{{ currCourse.price}}" min="0">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_start">Start</label>
+                                      <input type="date" name="editCourse_start" required id="id_start" value="{{ currCourse.start |date:'Y-m-d'}}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_end">End</label>
+                                      <input type="date" name="editCourse_end" required id="id_end" value="{{ currCourse.end |date:'Y-m-d'}}">
+                                    </div>
+                                  </div>
+
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Edit Course</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  {% endfor %}  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal add new course-->
+      <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="addClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <!-- Clicking on the Add New Course button will redirect the user to addCourse.html with the method post -->
+              <form role="form" action="/addCourse.html" method="post">
+                {% csrf_token %}
+                <!-- The following will be the informations the user need to fill in -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_name">Name</label>
+                    <input type="text" name="name" maxlength="200" required id="id_name">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_period">Period</label>
+                    <input type="text" name="period" maxlength="200" required id="id_period">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_place">Place</label>
+                    <input type="text" name="place" maxlength="200" required id="id_place">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_price">Price</label>
+                    <input type="number" name="price" value="0" required id="id_price" min="0">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_start">Start</label>
+                    <input class="form-control datepicker" type="text" name="start" required id="id_start" value="01/1/2021">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_end">End</label>
+                    <input class="form-control datepicker" type="text" name="end" required id="id_end" value="01/30/2020">
+                  </div>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Add New Course</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>                 
+                </div>
+              </form>  
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}

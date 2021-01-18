@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<!-- 
+  This HTML file is the file that is displayed after logging in and also after every error message
+-->
+
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row">
+          </div>
+          <h1  style="text-align:center;color:midnightblue">Welcome to Class Management System</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid mt--7">
+
+      <h1  style="text-align:center;color:orange">null</h1>
+      <h1  style="text-align:center;color:orange">null</h1>
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,211 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="container-fluid mt--7">
+
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Students Table</h3>
+              <!-- If the user clicks on the + button, then it will trigger the addStudentModal -->
+              <button class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal" type="button">+</button>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <!-- The names for the table's columns -->
+                    <th scope="col">Student Name</th>
+                    <th scope="col">Phone #</th>
+                    <th scope="col">Email</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="list">
+                  <!-- Uses for loop to loop through existingStudents -->
+                  {% for currStudent in existingStudents %}
+                    <tr>
+                      <!-- For each student, create a row and fill the row with its own information
+                              - Its student name
+                              - Its phone number
+                              - Its email
+                              - Its edit button
+                              - Its delete button
+                      -->
+                      <th scope="row">
+                        <div class="media align-items-center">
+                          <div class="media-body">
+                            <span class="mb-0 text-sm">{{ currStudent.name}}</span>
+                          </div>
+                        </div>
+                      </th>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currStudent.phone }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currStudent.email }}
+                        </span>
+                      </td>
+                    </td>
+                      <td class="text-right">
+                        <div class="dropdown">
+                          <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                            <a class="dropdown-item" data-toggle="modal" data-target="#editStudent{{currStudent.pk|cut:" "}}">Edit</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#deleteStudent{{currStudent.pk|cut:" "}}">Delete</a>                           
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Delete Student -->
+                        <div class="modal fade" id="deleteStudent{{currStudent.pk|cut:" "}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete Student</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form" action="/deleteStudent.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="input-coursename">Do you want to delete the student: {{currStudent.name}} ?</label>
+                                      <input type="hidden" name="targetStudent" value="{{ currStudent.pk }}">
+                                    </div>
+                                  </div>
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Edit Student -->
+                        <div class="modal fade" id="editStudent{{currStudent.pk|cut:" "}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <form role="form" action="/editStudent.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Name</label>
+                                      <input type="text" name="editStudent_name" maxlength="200" required id="id_name" value="{{ currStudent.name}}">
+                                      <input type="hidden" name="targetStudent" value="{{ currStudent.pk }}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_phone">Phone</label>
+                                      <input type="text" name="editStudent_phone" maxlength="200" required id="id_phone" value="{{ currStudent.phone}}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_email">Email</label>
+                                      <input type="email" name="editStudent_email" maxlength="200" required id="id_email" value="{{ currStudent.email}}">
+                                    </div>
+                                  </div>
+
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Edit Student</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  {% endfor %}  
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal add student-->
+      <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <!-- Clicking on the Add New Student button will redirect the user to addStudent.html with the method post -->
+              <form role="form" action="/addStudent.html" method="post">
+                {% csrf_token %}
+                <!-- The following will be the informations the user need to fill in -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_name">Name</label>
+                    <input type="text" name="name" maxlength="200" required id="id_name">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_phone">Phone</label>
+                    <input type="text" name="phone" maxlength="200" required id="id_phone">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="id_email">Email</label>
+                    <input type="email" name="email" maxlength="200" required id="id_email">
+                  </div>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Add New Student</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>                 
+                </div>
+              </form>  
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}

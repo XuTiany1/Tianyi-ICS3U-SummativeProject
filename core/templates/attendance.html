@@ -1,0 +1,176 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+<!-- 
+  This HTML file is the file that is displayed after the user clicks on Attendance on the sidebar
+-->
+
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Attendance Record</h3>
+              <!-- If the user is to click on the + button on the top left, then the user will be directed to attend-selectcourse.html -->
+              <a href="/attend-selectcourse.html">
+                <button class="btn btn-primary" type="button">+</button>
+            </a>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <!-- These are the column names for the table -->
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Student Name #</th>
+                    <th scope="col">Attend Date</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="list">
+                  <!-- Uses for loop to loop through the existingAttendances-->
+                  {% for currAttendance in existingAttendances %}
+                    <tr>
+                      <!-- For each currAttendance, create a row and fill the row with its own information
+                              - Its course name
+                              - Its Student name
+                              - The date of the attendance
+                              - Its edit button
+                              - Its delete button
+                      -->
+                      <th scope="row">
+                        <div class="media align-items-center">
+                          <div class="media-body">
+                            <span class="mb-0 text-sm">{{ currAttendance.course.name}}</span>
+                          </div>
+                        </div>
+                      </th>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currAttendance.student.name }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currAttendance.date_attended }}
+                        </span>
+                      </td>
+
+                      <td class="text-right">
+                        <div class="dropdown">
+                          <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                            <a class="dropdown-item" data-toggle="modal" data-target="#editAttendance{{currAttendance.pk}}">Edit</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#deleteAttendance{{currAttendance.pk}}">Delete</a>                           
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Delete Attendance -->
+                        <div class="modal fade" id="deleteAttendance{{currAttendance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete Attendance</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form" action="/deleteAttendance.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="input-coursename">Do you want to delete the Attendance: {{currAttendance.student.name}} for {{currAttendance.course.name}} ?</label>
+                                      <input type="hidden" name="targetAttendance" value="{{ currAttendance.pk }}">
+                                    </div>
+                                  </div>
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Edit Attendance -->
+                        <div class="modal fade" id="editAttendance{{currAttendance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <form role="form" action="/editAttendance.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Course Name</label>
+                                      <input type="text" name="editAttendance_coursename" maxlength="200" required id="id_name" disabled value="{{ currAttendance.course.name}}">
+                                      <input type="hidden" name="targetAttendance" value="{{ currAttendance.pk }}">
+                                    </div>
+                                  </div>
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Student Name</label>
+                                      <input type="text" name="editAttendance_studentname" maxlength="200" required id="id_name" disabled value="{{ currAttendance.student.name}}">
+                                    </div>
+                                  </div>
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_date_attended">Date Attended</label>
+                                      <input type="date" name="editAttendance_date_attended" required id="id_date_attended" value="{{ currAttendance.date_attended |date:'Y-m-d'}}">
+                                    </div>
+                                  </div>
+
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Edit</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  {% endfor %}  
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}

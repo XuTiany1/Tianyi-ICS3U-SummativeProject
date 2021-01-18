@@ -1,0 +1,198 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Tables {% endblock title %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="container-fluid mt--7">
+
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Registration Table</h3>
+              <a href="/register.html">
+                <button class="btn btn-primary" type="button">+</button>
+            </a>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <!-- The column names for the table -->
+                  <tr>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Student Name #</th>
+                    <th scope="col">Attend Times</th>
+                    <th scope="col">Paid Credit(CAD)</th>
+                    <th scope="col">Balance(CAD)</th>
+                    <th scope="col">Score</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="list">
+                  <!-- Uses for loop to loop through the existingRegistrations -->
+                  {% for currRegistration in existingRegistrations %}
+                    <tr>
+                        <!-- For each registration, create a row and fill the row with its own information
+                              - Its course name
+                              - The registered student
+                              - The amount of times a student attended class
+                              - The student's current balance with respect to the course
+                              - The student's latest test score. (0-100)
+                              - Its edit button
+                              - Its delete button
+                      -->
+                      <th scope="row">
+                        <div class="media align-items-center">
+                          <div class="media-body">
+                            <span class="mb-0 text-sm">{{ currRegistration.course.name}}</span>
+                          </div>
+                        </div>
+                      </th>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currRegistration.student.name }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currRegistration.attend_times }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currRegistration.paid_credit }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currRegistration.balance }} 
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i> {{ currRegistration.score }} 
+                        </span>
+                      </td>
+                    </td>
+                      <td class="text-right">
+                        <div class="dropdown">
+                          <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                            <a class="dropdown-item" data-toggle="modal" data-target="#editRegistration{{currRegistration.pk}}">Edit</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#deleteRegistration{{currRegistration.pk}}">Delete</a>                           
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Delete Registration -->
+                        <div class="modal fade" id="deleteRegistration{{currRegistration.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete Registration</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <form role="form" action="/deleteRegistration.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="input-coursename">Do you want to delete the registration: {{currRegistration.student.name}} for {{currRegistration.course.name}} ?</label>
+                                      <input type="hidden" name="targetRegistration" value="{{ currRegistration.pk }}">
+                                    </div>
+                                  </div>
+                                  <div class="text-center">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Modal -- Edit Registration -->
+                        <div class="modal fade" id="editRegistration{{currRegistration.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <form role="form" action="/editRegistration.html" method="post">
+
+                                  {% csrf_token %}
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Course Name</label>
+                                      <input type="text" name="editRegistration_coursename" maxlength="200" required id="id_name" disabled value="{{ currRegistration.course.name}}">
+                                      <input type="hidden" name="targetRegistraton" value="{{ currRegistration.pk }}">
+                                    </div>
+                                  </div>
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_name">Student Name</label>
+                                      <input type="text" name="editRegistration_studentname" maxlength="200" required id="id_name" disabled value="{{ currRegistration.student.name}}">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_paid_credit">Paid Credit</label>
+                                      <input type="number" name="editRegistration_paid_credit" maxlength="200" required id="id_paid_credit" value="{{ currRegistration.paid_credit}}" min="0">
+                                    </div>
+                                  </div>
+
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label class="form-control-label" for="id_score">Score</label>
+                                      <input type="number" name="editRegistration_score" value="0" required id="id_score" value="{{ currRegistration.score}}" min="0" max="100">
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Edit Registration</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>  
+                                  </div>
+                                </form>  
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  {% endfor %}  
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}
